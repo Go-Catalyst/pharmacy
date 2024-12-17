@@ -1,12 +1,13 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    _ "pharmacy/docs"
-    "github.com/swaggo/gin-swagger"
-    "github.com/swaggo/files"
-    "pharmacy/config"
-    "pharmacy/routes"
+	"pharmacy/config"
+	"pharmacy/db"
+	_ "pharmacy/docs"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title User CRUD API
@@ -16,13 +17,14 @@ import (
 // @BasePath /
 
 func main() {
-    config.LoadConfig()
+	config.LoadConfig()
+	db.Init()
 
-    r := gin.Default()
-    routes.RegisterRoutes(r)
+	r := gin.Default()
+	// routes.RegisterRoutes(r)
 
-    // Swagger UI
-    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Swagger UI
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    r.Run(":" + config.Config.Port)
+	r.Run(":" + config.Config.Port)
 }
