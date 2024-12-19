@@ -2,12 +2,11 @@ package db
 
 import (
 	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"pharmacy/config"
 
-	"github.com/jinzhu/gorm"
-
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	_ "github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -18,12 +17,12 @@ func Init() {
 	if config.Config.DB == "pg" {
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 			config.Config.DBHOST, config.Config.DBUSER, config.Config.DBPASSWORD, config.Config.DBNAME, config.Config.DBPORT)
-		DB, err = gorm.Open("postgres", dsn)
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	} else {
-		DB, err = gorm.Open("sqlite3", "phdb")
+		DB, err = gorm.Open(sqlite.Open("phdb.db"), &gorm.Config{})
 	}
 
 	if err != nil {
-		panic("failed to connect to database")
+		panic("failed to connect to database: " + err.Error())
 	}
 }

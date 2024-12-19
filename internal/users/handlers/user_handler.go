@@ -1,10 +1,10 @@
 package handlers
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    "pharmacy/internal/users/models"
-    "pharmacy/internal/users/repository"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"pharmacy/internal/users/models"
+	"pharmacy/internal/users/repository"
 )
 
 var userRepository = repository.NewUserRepository()
@@ -18,8 +18,8 @@ var userRepository = repository.NewUserRepository()
 // @Success 200 {array} models.User
 // @Router /users [get]
 func GetUsers(c *gin.Context) {
-    users := userRepository.GetAllUsers()
-    c.JSON(http.StatusOK, users)
+	users := userRepository.GetAllUsers()
+	c.JSON(http.StatusOK, users)
 }
 
 // GetUser godoc
@@ -32,13 +32,13 @@ func GetUsers(c *gin.Context) {
 // @Success 200 {object} models.User
 // @Router /users/{id} [get]
 func GetUser(c *gin.Context) {
-    id := c.Param("id")
-    user, err := userRepository.GetUserByID(id)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.JSON(http.StatusOK, user)
+	id := c.Param("id")
+	user, err := userRepository.GetUserByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
 
 // CreateUser godoc
@@ -51,13 +51,13 @@ func GetUser(c *gin.Context) {
 // @Success 201 {object} models.User
 // @Router /users [post]
 func CreateUser(c *gin.Context) {
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    userRepository.CreateUser(&user)
-    c.JSON(http.StatusCreated, user)
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userRepository.CreateUser(&user)
+	c.JSON(http.StatusCreated, user)
 }
 
 // UpdateUser godoc
@@ -71,18 +71,18 @@ func CreateUser(c *gin.Context) {
 // @Success 200 {object} models.User
 // @Router /users/{id} [put]
 func UpdateUser(c *gin.Context) {
-    id := c.Param("id")
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    updatedUser, err := userRepository.UpdateUser(id, &user)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.JSON(http.StatusOK, updatedUser)
+	id := c.Param("id")
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	updatedUser, err := userRepository.UpdateUser(id, &user)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, updatedUser)
 }
 
 // DeleteUser godoc
@@ -95,10 +95,10 @@ func UpdateUser(c *gin.Context) {
 // @Success 204
 // @Router /users/{id} [delete]
 func DeleteUser(c *gin.Context) {
-    id := c.Param("id")
-    if err := userRepository.DeleteUser(id); err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.Status(http.StatusNoContent)
+	id := c.Param("id")
+	if err := userRepository.DeleteUser(id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }

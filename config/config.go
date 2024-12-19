@@ -28,12 +28,12 @@ func LoadConfig() {
 
 	Config = Configuration{
 		Port:       getEnv("PORT", "8080"),
-		DB:         getEnv("DB", "pg"),
-		DBHOST:     getEnv("DBHOST", ""),
-		DBUSER:     getEnv("DBUSER", ""),
-		DBPASSWORD: getEnv("DBPASSWORD", ""),
-		DBPORT:     getEnv("DBPORT", ""),
-		DBNAME:     getEnv("DBNAME", ""),
+		DB:         getEnv("DB", "sqllite"),
+		DBHOST:     getEnv("DBHOST", "localhost"),
+		DBUSER:     getEnv("DBUSER", "postgres"),
+		DBPASSWORD: getEnv("DBPASSWORD", "password"),
+		DBPORT:     getEnv("DBPORT", "5432"),
+		DBNAME:     getEnv("DBNAME", "phdb"),
 	}
 
 }
