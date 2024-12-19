@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"pharmacy/internal/users/models"
-	"pharmacy/internal/users/repository"
+	"pharmacy/models"
+	"pharmacy/repository"
 )
 
 var userRepository = repository.NewUserRepository()

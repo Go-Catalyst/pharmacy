@@ -1,10 +1,10 @@
-package category_handlers
+package handlers
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"pharmacy/internal/categories/models"
-	"pharmacy/internal/categories/repository"
+	"pharmacy/models"
+	"pharmacy/repository"
 )
 
 var categoryRepository = repository.NewCategoryRepository()
@@ -25,6 +25,6 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 	categoryRepository.CreateCategory(&category)
-	
+
 	c.JSON(http.StatusCreated, category)
 }

@@ -2,16 +2,15 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"pharmacy/internal/categories/category_handlers"
-	"pharmacy/internal/users/handlers"
+	handlers2 "pharmacy/handlers"
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	r.GET("/users", handlers.GetUsers)
-	r.GET("/users/:id", handlers.GetUser)
-	r.POST("/users", handlers.CreateUser)
-	r.PUT("/users/:id", handlers.UpdateUser)
-	r.DELETE("/users/:id", handlers.DeleteUser)
+	r.GET("/users", handlers2.GetUsers)
+	r.GET("/users/:id", handlers2.GetUser)
+	r.POST("/users", handlers2.CreateUser)
+	r.PUT("/users/:id", handlers2.UpdateUser)
+	r.DELETE("/users/:id", handlers2.DeleteUser)
 
-	r.POST("/categories", category_handlers.CreateCategory)
+	r.POST("/categories", handlers2.CreateCategory)
 }
