@@ -25,5 +25,6 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 	categoryRepository.CreateCategory(&category)
+	
 	c.JSON(http.StatusCreated, category)
 }
