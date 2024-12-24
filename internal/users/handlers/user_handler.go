@@ -1,13 +1,24 @@
 package handlers
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    "pharmacy/internal/users/models"
-    "pharmacy/internal/users/repository"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
+	"net/http"
+	"os"
+	"pharmacy/db"
+	"pharmacy/internal/users/models"
+	"pharmacy/internal/users/repository"
+	"time"
 )
 
 var userRepository = repository.NewUserRepository()
+
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 
 // GetUsers godoc
 // @Summary Get all users
@@ -18,8 +29,8 @@ var userRepository = repository.NewUserRepository()
 // @Success 200 {array} models.User
 // @Router /users [get]
 func GetUsers(c *gin.Context) {
-    users := userRepository.GetAllUsers()
-    c.JSON(http.StatusOK, users)
+	users := userRepository.GetAllUsers()
+	c.JSON(http.StatusOK, users)
 }
 
 // GetUser godoc
@@ -32,13 +43,13 @@ func GetUsers(c *gin.Context) {
 // @Success 200 {object} models.User
 // @Router /users/{id} [get]
 func GetUser(c *gin.Context) {
-    id := c.Param("id")
-    user, err := userRepository.GetUserByID(id)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.JSON(http.StatusOK, user)
+	id := c.Param("id")
+	user, err := userRepository.GetUserByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
 
 // CreateUser godoc
@@ -51,13 +62,13 @@ func GetUser(c *gin.Context) {
 // @Success 201 {object} models.User
 // @Router /users [post]
 func CreateUser(c *gin.Context) {
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    userRepository.CreateUser(&user)
-    c.JSON(http.StatusCreated, user)
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userRepository.CreateUser(&user)
+	c.JSON(http.StatusCreated, user)
 }
 
 // UpdateUser godoc
@@ -71,18 +82,18 @@ func CreateUser(c *gin.Context) {
 // @Success 200 {object} models.User
 // @Router /users/{id} [put]
 func UpdateUser(c *gin.Context) {
-    id := c.Param("id")
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    updatedUser, err := userRepository.UpdateUser(id, &user)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.JSON(http.StatusOK, updatedUser)
+	id := c.Param("id")
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	updatedUser, err := userRepository.UpdateUser(id, &user)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, updatedUser)
 }
 
 // DeleteUser godoc
@@ -95,10 +106,54 @@ func UpdateUser(c *gin.Context) {
 // @Success 204
 // @Router /users/{id} [delete]
 func DeleteUser(c *gin.Context) {
-    id := c.Param("id")
-    if err := userRepository.DeleteUser(id); err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-        return
-    }
-    c.Status(http.StatusNoContent)
+	id := c.Param("id")
+	if err := userRepository.DeleteUser(id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+func Login(c *gin.Context) {
+	var User models.User
+	var Loginrequest LoginRequest
+	if err := c.ShouldBindJSON(&Loginrequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input, username and password are required"})
+		return
+	}
+
+	// Query the database for the user
+	err := db.DB.Where("username = ?", Loginrequest.Username).First(&User).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		}
+		return
+	}
+
+	// Compare the stored hashed password with the provided password
+	if bcrypt.CompareHashAndPassword([]byte(User.Password), []byte(Loginrequest.Password)) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		return
+	}
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT_SECRET environment variable not set"})
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": Loginrequest.Username,
+		"exp":      time.Now().Add(time.Hour * 1).Unix(),
+	})
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create token"})
+		return
+	}
+
+	// Send the token in the response
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }

@@ -15,7 +15,7 @@ var DB *gorm.DB
 func Init() {
 
 	var err error
-	if config.Config.DB == "pg" {
+	if config.Config.DB == "to be changed" {
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 			config.Config.DBHOST, config.Config.DBUSER, config.Config.DBPASSWORD, config.Config.DBNAME, config.Config.DBPORT)
 		DB, err = gorm.Open("postgres", dsn)
