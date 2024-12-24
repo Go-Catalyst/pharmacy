@@ -17,7 +17,7 @@ import (
 // @BasePath /
 
 func main() {
-	config.LoadConfig()
+	//config.LoadConfig()
 	db.Init()
 
 	r := gin.Default()
