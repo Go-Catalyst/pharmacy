@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"pharmacy/models"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"pharmacy/internal/users/models"
 )
 
 type UserRepository struct {
@@ -11,11 +11,14 @@ type UserRepository struct {
 }
 
 func NewUserRepository() *UserRepository {
-	db, err := gorm.Open("sqlite3", "phdb.db")
+	db, err := gorm.Open(sqlite.Open("phdb.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.User{})
+	if err != nil {
+		return nil
+	}
 	return &UserRepository{db: db}
 }
 

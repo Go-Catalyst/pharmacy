@@ -3,7 +3,7 @@ package repository
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"pharmacy/models"
+	"pharmacy/internal/categories/models"
 )
 
 type CategoryRepository struct {

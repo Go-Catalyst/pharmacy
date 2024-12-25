@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"pharmacy/models"
-	"pharmacy/repository"
+	"pharmacy/internal/categories/models"
+	"pharmacy/internal/categories/repository"
 )
 
 var categoryRepository = repository.NewCategoryRepository()
