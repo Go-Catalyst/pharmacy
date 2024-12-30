@@ -6,7 +6,6 @@ import (
 	"pharmacy/internal/categories/models"
 )
 
-
 type CategoryRepository struct {
 	db *gorm.DB
 }
@@ -28,28 +27,27 @@ func (repo *CategoryRepository) GetAllCategories() []models.Category {
 
 func (repo *CategoryRepository) GetCategoryByID(id string) (models.Category, error) {
 	var category models.Category
-	if err := repo.db.Where("id = ?", id).First(&category).Error; err != nil {
+	if err := repo.db.First(&category, id).Error; err != nil {
 		return category, err
 	}
 	return category, nil
 }
 
 func (repo *CategoryRepository) CreateCategory(category *models.Category) {
-	repo.db.Create(category)
+	repo.db.Create(&category)
 }
 
-func (repo *CategoryRepository) UpdateCategory(id string, updatedCategory *models.Category) (models.Category, error) {
+func (repo *CategoryRepository) UpdateCategory(id string, updatedCategory models.Category) (models.Category, error) {
 	var category models.Category
-	if err := repo.db.Where("id = ?", id).First(&category).Error; err != nil {
+	if err := repo.db.First(&category, id).Error; err != nil {
 		return category, err
 	}
-	category.Name = updatedCategory.Name
-	repo.db.Save(&category)
+	repo.db.Model(&category).Updates(updatedCategory)
 	return category, nil
 }
 
 func (repo *CategoryRepository) DeleteCategory(id string) error {
-	if err := repo.db.Where("id = ?", id).Delete(&models.Category{}).Error; err != nil {
+	if err := repo.db.Delete(&models.Category{}, id).Error; err != nil {
 		return err
 	}
 	return nil

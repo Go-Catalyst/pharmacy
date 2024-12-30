@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"pharmacy/internal/categories/models"
 	"pharmacy/internal/categories/repository"
@@ -33,7 +34,7 @@ func GetCategories(c *gin.Context) {
 // @Router /categories/{id} [get]
 func GetCategory(c *gin.Context) {
 	id := c.Param("id")
-	category, err := categoryRepository.GetCategoryByIDByID(id)
+	category, err := categoryRepository.GetCategoryByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
@@ -52,6 +53,7 @@ func GetCategory(c *gin.Context) {
 // @Router /categories [post]
 func CreateCategory(c *gin.Context) {
 	var category models.Category
+	log.Print("inja")
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -59,10 +61,6 @@ func CreateCategory(c *gin.Context) {
 	categoryRepository.CreateCategory(&category)
 	c.JSON(http.StatusCreated, category)
 }
-
-
-
-
 
 // UpdateCategory godoc
 // @Summary Update a category
@@ -81,7 +79,7 @@ func UpdateCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedCategory, err := categoryRepository.updateCategory(id, &category)
+	updatedCategory, err := categoryRepository.UpdateCategory(id, category)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
@@ -106,4 +104,3 @@ func DeleteCategory(c *gin.Context) {
 	}
 	c.Status(http.StatusNoContent)
 }
-
