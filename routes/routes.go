@@ -7,11 +7,15 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
+	r.POST("/users", userHandlers.CreateUser)
 	r.GET("/users", userHandlers.GetUsers)
 	r.GET("/users/:id", userHandlers.GetUser)
-	r.POST("/users", userHandlers.CreateUser)
 	r.PUT("/users/:id", userHandlers.UpdateUser)
 	r.DELETE("/users/:id", userHandlers.DeleteUser)
 
 	r.POST("/categories", categoryHandlers.CreateCategory)
+	r.GET("/categories", categoryHandlers.GetCategories)
+	r.GET("/categories/:id", categoryHandlers.GetCategory)
+	r.PUT("/categories/:id", categoryHandlers.UpdateCategory)
+	r.DELETE("/categories/:id", categoryHandlers.DeleteCategory)
 }

@@ -25,3 +25,32 @@ func NewCategoryRepository() *CategoryRepository {
 func (repo *CategoryRepository) CreateCategory(category *models.Category) {
 	repo.db.Create(category)
 }
+
+func (repo *CategoryRepository) GetAllCategories() []models.Category {
+	var categories []models.Category
+	repo.db.Find(&categories)
+	return categories
+}
+
+// GetCategoryByID todo: test it!
+func (repo *CategoryRepository) GetCategoryByID(id uint) (*models.Category, error) {
+	var category *models.Category
+	if err := repo.db.First(category, id).Error; err != nil {
+		return nil, err
+	}
+	return category, nil
+}
+
+func (repo *CategoryRepository) UpdateCategory(id uint, updatedCategory models.Category) (*models.Category, error) {
+	var category *models.Category
+	if err := repo.db.First(&category, id).Error; err != nil {
+		return nil, err
+	}
+	repo.db.Model(category).Updates(updatedCategory)
+	return category, nil
+}
+
+func (repo *CategoryRepository) DeleteCategory(id uint) error {
+	err := repo.db.Delete(&models.Category{}, id).Error
+	return err
+}
