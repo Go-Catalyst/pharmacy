@@ -3,6 +3,7 @@ package repository
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"log"
 	"pharmacy/internal/categories/models"
 )
 
@@ -23,7 +24,7 @@ func NewCategoryRepository() *CategoryRepository {
 }
 
 func (repo *CategoryRepository) CreateCategory(category *models.Category) {
-	repo.db.Create(category)
+	repo.db.Create(&category)
 }
 
 func (repo *CategoryRepository) GetAllCategories() []models.Category {
@@ -35,7 +36,8 @@ func (repo *CategoryRepository) GetAllCategories() []models.Category {
 // GetCategoryByID todo: test it!
 func (repo *CategoryRepository) GetCategoryByID(id uint) (*models.Category, error) {
 	var category *models.Category
-	if err := repo.db.First(category, id).Error; err != nil {
+	log.Print(id)
+	if err := repo.db.First(&category, id).Error; err != nil {
 		return nil, err
 	}
 	return category, nil
@@ -46,7 +48,7 @@ func (repo *CategoryRepository) UpdateCategory(id uint, updatedCategory models.C
 	if err := repo.db.First(&category, id).Error; err != nil {
 		return nil, err
 	}
-	repo.db.Model(category).Updates(updatedCategory)
+	repo.db.Model(&category).Updates(updatedCategory)
 	return category, nil
 }
 

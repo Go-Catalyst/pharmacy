@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2a0d5903-760d-44be-8419-efb87304fc6c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ccf7a8b9-636d-4354-84bc-1800c463e586.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/ccf7a8b9-636d-4354-84bc-1800c463e586.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/categories/handlers/category_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/categories/handlers/category_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/categories/models/category_model.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/categories/models/category_model.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/categories/repository/category_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/categories/repository/category_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes/routes.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
