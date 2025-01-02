@@ -34,7 +34,7 @@ func (repo *CategoryRepository) GetAllCategories() []models.Category {
 }
 
 // GetCategoryByID todo: test it!
-func (repo *CategoryRepository) GetCategoryByID(id uint) (*models.Category, error) {
+func (repo *CategoryRepository) GetCategoryByID(id string) (*models.Category, error) {
 	var category *models.Category
 	log.Print(id)
 	if err := repo.db.First(&category, id).Error; err != nil {
@@ -43,7 +43,7 @@ func (repo *CategoryRepository) GetCategoryByID(id uint) (*models.Category, erro
 	return category, nil
 }
 
-func (repo *CategoryRepository) UpdateCategory(id uint, updatedCategory models.Category) (*models.Category, error) {
+func (repo *CategoryRepository) UpdateCategory(id string, updatedCategory models.Category) (*models.Category, error) {
 	var category *models.Category
 	if err := repo.db.First(&category, id).Error; err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (repo *CategoryRepository) UpdateCategory(id uint, updatedCategory models.C
 	return category, nil
 }
 
-func (repo *CategoryRepository) DeleteCategory(id uint) error {
+func (repo *CategoryRepository) DeleteCategory(id string) error {
 	err := repo.db.Delete(&models.Category{}, id).Error
 	return err
 }

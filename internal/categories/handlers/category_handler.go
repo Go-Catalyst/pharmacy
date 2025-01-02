@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"pharmacy/internal/categories/models"
 	"pharmacy/internal/categories/repository"
-	"strconv"
 )
 
 var categoryRepository = repository.NewCategoryRepository()
@@ -53,8 +52,7 @@ func GetCategories(c *gin.Context) {
 // @Success 200 {object} models.Category
 // @Router /categories/{id} [get]
 func GetCategory(c *gin.Context) {
-	idString := c.Param("id")
-	id, err := StringToUint(idString)
+	id := c.Param("id")
 	category, err := categoryRepository.GetCategoryByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
@@ -74,11 +72,7 @@ func GetCategory(c *gin.Context) {
 // @Success 200 {object} models.Category
 // @Router /categories/{id} [put]
 func UpdateCategory(c *gin.Context) {
-	idString := c.Param("id")
-	id, err := StringToUint(idString)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
+	id := c.Param("id")
 	var category models.Category
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -102,19 +96,10 @@ func UpdateCategory(c *gin.Context) {
 // @Success 204
 // @Router /categories/{id} [delete]
 func DeleteCategory(c *gin.Context) {
-	idString := c.Param("id")
-	id, err := StringToUint(idString)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
+	id := c.Param("id")
 	if err := categoryRepository.DeleteCategory(id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
 	}
 	c.Status(http.StatusNoContent)
-}
-
-func StringToUint(s string) (uint, error) {
-	value, err := strconv.ParseUint(s, 10, 0)
-	return uint(value), err
 }
