@@ -4,6 +4,8 @@ import (
 	"pharmacy/config"
 	"pharmacy/db"
 	_ "pharmacy/docs"
+	"pharmacy/routes"
+
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -21,7 +23,7 @@ func main() {
 	db.Init()
 
 	r := gin.Default()
-	// routes.RegisterRoutes(r)
+	routes.RegisterRoutes(r)
 
 	// Swagger UI
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
