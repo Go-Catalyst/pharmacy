@@ -14,5 +14,7 @@ func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler) {
 		api.POST("/users", userHandler.CreateUser)
 		api.PUT("/users/:id", userHandler.UpdateUser)
 		api.DELETE("/users/:id", userHandler.DeleteUser)
+		api.POST("/jwt", userHandler.Login)
+
 	}
 }

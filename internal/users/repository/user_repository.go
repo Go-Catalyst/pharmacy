@@ -29,6 +29,14 @@ func (repo *UserRepository) GetUserByID(id string) (models.User, error) {
 	return user, nil
 }
 
+func (repo *UserRepository) GetUserByEmail(username string) (models.User, error) {
+	var user models.User
+	if err := repo.db.Where("Email = ?", username).First(&user).Error; err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
 func (repo *UserRepository) CreateUser(user *models.User) {
 	repo.db.Create(user)
 }
