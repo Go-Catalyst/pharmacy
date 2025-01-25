@@ -1,14 +1,18 @@
 package routes
 
 import (
-    "github.com/gin-gonic/gin"
-    "pharmacy/internal/users/handlers"
+	user "pharmacy/internal/users/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine) {
-    r.GET("/users", handlers.GetUsers)
-    r.GET("/users/:id", handlers.GetUser)
-    r.POST("/users", handlers.CreateUser)
-    r.PUT("/users/:id", handlers.UpdateUser)
-    r.DELETE("/users/:id", handlers.DeleteUser)
+func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler) {
+	api := r.Group("/api")
+	{
+		api.GET("/users", userHandler.GetUsers)
+		api.GET("/users/:id", userHandler.GetUser)
+		api.POST("/users", userHandler.CreateUser)
+		api.PUT("/users/:id", userHandler.UpdateUser)
+		api.DELETE("/users/:id", userHandler.DeleteUser)
+	}
 }
