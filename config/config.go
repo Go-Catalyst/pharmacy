@@ -8,41 +8,34 @@ import (
 )
 
 type Configuration struct {
-	Port       string
-	DB         string
-	DBHOST     string
-	DBUSER     string
-	DBPASSWORD string
-	DBPORT     string
-	DBNAME     string
+	DBPath    string
+	DBType    string
+	Username  string
+	Password  string
+	APIDomain string
+	URIMongo  string
+	GoSecret  string
+	URIRabbit string
+	Port      string
 }
 
 var Config Configuration
 
-func LoadConfig() {
-
+func LoadConfig() *Configuration {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Error loading .env file")
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	Config = Configuration{
-		Port:       getEnv("PORT", "8080"),
-		DB:         getEnv("DB", "pg"),
-		DBHOST:     getEnv("DBHOST", ""),
-		DBUSER:     getEnv("DBUSER", ""),
-		DBPASSWORD: getEnv("DBPASSWORD", ""),
-		DBPORT:     getEnv("DBPORT", ""),
-		DBNAME:     getEnv("DBNAME", ""),
+	return &Configuration{
+		DBPath:    os.Getenv("DB_PATH"),
+		DBType:    os.Getenv("DB_TYPE"),
+		Username:  os.Getenv("USST"),
+		Password:  os.Getenv("PSST"),
+		APIDomain: os.Getenv("API_DOMAIN"),
+		URIMongo:  os.Getenv("URI_MONGO"),
+		GoSecret:  os.Getenv("GOLANG_SECRET"),
+		URIRabbit: os.Getenv("URI_RABBIT"),
+		Port:      os.Getenv("PORT"),
 	}
-
-}
-
-func getEnv(key, defaultValue string) string {
-	value, exists := os.LookupEnv(key)
-	if !exists {
-		log.Printf("Environment variable %s not set, using default value %s", key, defaultValue)
-		return defaultValue
-	}
-	return value
 }

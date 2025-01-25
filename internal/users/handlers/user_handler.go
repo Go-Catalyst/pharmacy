@@ -1,19 +1,26 @@
 package handlers
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
-	"pharmacy/db"
 	"pharmacy/internal/users/models"
-	"pharmacy/internal/users/repository"
+	repositories "pharmacy/internal/users/repository"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+
+	"github.com/gin-gonic/gin"
 )
 
-var userRepository = repository.NewUserRepository()
+type UserHandler struct {
+	Repo *repositories.UserRepository
+}
+
+func NewUserHandler(repo *repositories.UserRepository) *UserHandler {
+	return &UserHandler{Repo: repo}
+}
 
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
@@ -28,8 +35,8 @@ type LoginRequest struct {
 // @Produce  json
 // @Success 200 {array} models.User
 // @Router /users [get]
-func GetUsers(c *gin.Context) {
-	users := userRepository.GetAllUsers()
+func (h *UserHandler) GetUsers(c *gin.Context) {
+	users := h.Repo.GetAllUsers()
 	c.JSON(http.StatusOK, users)
 }
 
@@ -42,9 +49,10 @@ func GetUsers(c *gin.Context) {
 // @Param id path int true "User ID"
 // @Success 200 {object} models.User
 // @Router /users/{id} [get]
-func GetUser(c *gin.Context) {
+func (h *UserHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
-	user, err := userRepository.GetUserByID(id)
+	user, err := h.Repo.GetUserByID(id)
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
@@ -61,13 +69,15 @@ func GetUser(c *gin.Context) {
 // @Param user body models.User true "User"
 // @Success 201 {object} models.User
 // @Router /users [post]
-func CreateUser(c *gin.Context) {
+func (h *UserHandler) CreateUser(c *gin.Context) {
+
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	userRepository.CreateUser(&user)
+	h.Repo.CreateUser(&user)
+
 	c.JSON(http.StatusCreated, user)
 }
 
@@ -81,14 +91,16 @@ func CreateUser(c *gin.Context) {
 // @Param user body models.User true "User"
 // @Success 200 {object} models.User
 // @Router /users/{id} [put]
-func UpdateUser(c *gin.Context) {
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+
 	id := c.Param("id")
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedUser, err := userRepository.UpdateUser(id, &user)
+	updatedUser, err := h.Repo.UpdateUser(id, &user)
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
@@ -105,15 +117,17 @@ func UpdateUser(c *gin.Context) {
 // @Param id path int true "User ID"
 // @Success 204
 // @Router /users/{id} [delete]
-func DeleteUser(c *gin.Context) {
+func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	if err := userRepository.DeleteUser(id); err != nil {
+	if err := h.Repo.DeleteUser(id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
 	c.Status(http.StatusNoContent)
+
 }
-func Login(c *gin.Context) {
+
+func (h *UserHandler) Login(c *gin.Context) {
 	var User models.User
 	var Loginrequest LoginRequest
 	if err := c.ShouldBindJSON(&Loginrequest); err != nil {
@@ -122,7 +136,7 @@ func Login(c *gin.Context) {
 	}
 
 	// Query the database for the user
-	err := db.DB.Where("username = ?", Loginrequest.Username).First(&User).Error
+	user, err := h.Repo.GetUserByEmail(Loginrequest.Username)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
@@ -145,7 +159,7 @@ func Login(c *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": Loginrequest.Username,
+		"username": user.Name,
 		"exp":      time.Now().Add(time.Hour * 1).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(secret))
