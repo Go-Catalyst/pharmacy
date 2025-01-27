@@ -76,6 +76,13 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+	user.Password = string(hashedPassword)
+
 	h.Repo.CreateUser(&user)
 
 	c.JSON(http.StatusCreated, user)
@@ -105,6 +112,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
+
 	c.JSON(http.StatusOK, updatedUser)
 }
 
@@ -128,7 +136,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
-	var User models.User
+
 	var Loginrequest LoginRequest
 	if err := c.ShouldBindJSON(&Loginrequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input, username and password are required"})
@@ -147,7 +155,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	// Compare the stored hashed password with the provided password
-	if bcrypt.CompareHashAndPassword([]byte(User.Password), []byte(Loginrequest.Password)) != nil {
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Loginrequest.Password)) != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
