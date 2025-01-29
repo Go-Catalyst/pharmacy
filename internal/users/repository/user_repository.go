@@ -37,8 +37,12 @@ func (repo *UserRepository) GetUserByEmail(username string) (models.User, error)
 	return user, nil
 }
 
-func (repo *UserRepository) CreateUser(user *models.User) {
+func (repo *UserRepository) CreateUser(user *models.User) error {
+	if err := user.HashPassword(); err != nil {
+		return err
+	}
 	repo.db.Create(user)
+	return nil
 }
 
 func (repo *UserRepository) UpdateUser(id string, updatedUser *models.User) (models.User, error) {
@@ -46,8 +50,16 @@ func (repo *UserRepository) UpdateUser(id string, updatedUser *models.User) (mod
 	if err := repo.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return user, err
 	}
+
 	user.Name = updatedUser.Name
 	user.Email = updatedUser.Email
+
+	if updatedUser.Password != "" {
+		if err := user.HashPassword(); err != nil {
+			return user, err
+		}
+	}
+
 	repo.db.Save(&user)
 	return user, nil
 }
