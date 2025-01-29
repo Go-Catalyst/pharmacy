@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler) {
 	api := r.Group("/api")
 	{
@@ -17,4 +18,5 @@ func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler) {
 		api.POST("/jwt", userHandler.Login)
 
 	}
+
 }

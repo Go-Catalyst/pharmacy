@@ -36,6 +36,7 @@ func main() {
 	// Create Gin router
 	r := gin.Default()
 
+
 	// Set up repository and handler
 	userRepo := userRepo.NewUserRepository(config.DB)
 	userHandler := userHandlers.NewUserHandler(userRepo)
