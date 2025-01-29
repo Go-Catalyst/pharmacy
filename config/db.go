@@ -1,6 +1,7 @@
 package config
 
 import (
+	categoryModels "pharmacy/internal/categories/models"
 	"pharmacy/internal/users/models"
 
 	"log"
@@ -70,6 +71,7 @@ func InitPGDB(dsn string) {
 func RunMigrations() {
 	// Run migrations
 	err = DB.AutoMigrate(&models.User{})
+	err = DB.AutoMigrate(&categoryModels.Category{})
 
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)

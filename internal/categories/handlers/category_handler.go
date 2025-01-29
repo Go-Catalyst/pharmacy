@@ -1,14 +1,21 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"pharmacy/internal/categories/models"
 	"pharmacy/internal/categories/repository"
+
+	"github.com/gin-gonic/gin"
 )
 
-var categoryRepository = repository.NewCategoryRepository()
+type CategoryHandler struct {
+	categoryRepository *repository.CategoryRepository
+}
+
+func NewCategoryHandler(repo *repository.CategoryRepository) *CategoryHandler {
+	return &CategoryHandler{categoryRepository: repo}
+}
 
 // GetCategories godoc
 // @Summary Get all categories
@@ -18,8 +25,8 @@ var categoryRepository = repository.NewCategoryRepository()
 // @Produce  json
 // @Success 200 {array} models.Category
 // @Router /categories [get]
-func GetCategories(c *gin.Context) {
-	categories := categoryRepository.GetAllCategories()
+func (h *CategoryHandler) GetCategories(c *gin.Context) {
+	categories := h.categoryRepository.GetAllCategories()
 	c.JSON(http.StatusOK, categories)
 }
 
@@ -32,9 +39,9 @@ func GetCategories(c *gin.Context) {
 // @Param id path int true "Category ID"
 // @Success 200 {object} models.Category
 // @Router /categories/{id} [get]
-func GetCategory(c *gin.Context) {
+func (h *CategoryHandler) GetCategory(c *gin.Context) {
 	id := c.Param("id")
-	category, err := categoryRepository.GetCategoryByID(id)
+	category, err := h.categoryRepository.GetCategoryByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
@@ -51,14 +58,14 @@ func GetCategory(c *gin.Context) {
 // @Param category body models.Category true "Category"
 // @Success 201 {object} models.Category
 // @Router /categories [post]
-func CreateCategory(c *gin.Context) {
+func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 	var category models.Category
 	log.Print("inja")
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	categoryRepository.CreateCategory(&category)
+	h.categoryRepository.CreateCategory(&category)
 	c.JSON(http.StatusCreated, category)
 }
 
@@ -72,14 +79,14 @@ func CreateCategory(c *gin.Context) {
 // @Param category body models.Category true "Category"
 // @Success 200 {object} models.Category
 // @Router /categories/{id} [put]
-func UpdateCategory(c *gin.Context) {
+func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 	id := c.Param("id")
 	var category models.Category
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedCategory, err := categoryRepository.UpdateCategory(id, category)
+	updatedCategory, err := h.categoryRepository.UpdateCategory(id, category)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
@@ -96,9 +103,9 @@ func UpdateCategory(c *gin.Context) {
 // @Param id path int true "Category ID"
 // @Success 204
 // @Router /categories/{id} [delete]
-func DeleteCategory(c *gin.Context) {
+func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
-	if err := categoryRepository.DeleteCategory(id); err != nil {
+	if err := h.categoryRepository.DeleteCategory(id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
 		return
 	}

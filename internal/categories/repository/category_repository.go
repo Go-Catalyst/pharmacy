@@ -1,21 +1,17 @@
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"pharmacy/internal/categories/models"
+
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/gorm"
 )
 
 type CategoryRepository struct {
 	db *gorm.DB
 }
 
-func NewCategoryRepository() *CategoryRepository {
-	db, err := gorm.Open("sqlite3", "phdb.db")
-	if err != nil {
-		panic("failed to connect database")
-	}
-	db.AutoMigrate(&models.Category{})
+func NewCategoryRepository(db *gorm.DB) *CategoryRepository {
 	return &CategoryRepository{db: db}
 }
 
