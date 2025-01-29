@@ -1,20 +1,28 @@
 package routes
 
 import (
+	user "pharmacy/internal/users/handlers"
+
 	"github.com/gin-gonic/gin"
-	categoryHandlers "pharmacy/internal/categories/handlers"
-	userHandlers "pharmacy/internal/users/handlers"
 )
 
-func RegisterRoutes(r *gin.Engine) {
-	r.GET("/users", userHandlers.GetUsers)
-	r.GET("/users/:id", userHandlers.GetUser)
-	r.POST("/users", userHandlers.CreateUser)
-	r.PUT("/users/:id", userHandlers.UpdateUser)
-	r.DELETE("/users/:id", userHandlers.DeleteUser)
-	r.GET("/categories", categoryHandlers.GetCategories)
-	r.GET("/categories/:id", categoryHandlers.GetCategory)
-	r.POST("/categories", categoryHandlers.CreateCategory)
-	r.PUT("/categories/:id", categoryHandlers.UpdateCategory)
-	r.DELETE("/categories/:id", categoryHandlers.DeleteCategory)
+
+func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler) {
+	api := r.Group("/api")
+	{
+		api.GET("/users", userHandler.GetUsers)
+		api.GET("/users/:id", userHandler.GetUser)
+		api.POST("/users", userHandler.CreateUser)
+		api.PUT("/users/:id", userHandler.UpdateUser)
+		api.DELETE("/users/:id", userHandler.DeleteUser)
+		api.POST("/jwt", userHandler.Login)
+    
+    api.GET("/categories/:id", categoryHandlers.GetCategory)
+    api.POST("/categories", categoryHandlers.CreateCategory)
+    api.PUT("/categories/:id", categoryHandlers.UpdateCategory)
+    api.DELETE("/categories/:id", categoryHandlers.DeleteCategory)
+
+	}
+  
+
 }
