@@ -5,6 +5,8 @@ import (
 	"log"
 	"pharmacy/config"
 	"pharmacy/docs"
+	categoryHandlers "pharmacy/internal/categories/handlers"
+	categoryRepo "pharmacy/internal/categories/repository"
 	userHandlers "pharmacy/internal/users/handlers"
 	userRepo "pharmacy/internal/users/repository"
 	"pharmacy/routes"
@@ -36,13 +38,16 @@ func main() {
 	// Create Gin router
 	r := gin.Default()
 
-
 	// Set up repository and handler
 	userRepo := userRepo.NewUserRepository(config.DB)
 	userHandler := userHandlers.NewUserHandler(userRepo)
 
+	// Set up repository and handler
+	categoryRepo := categoryRepo.NewCategoryRepository(config.DB)
+	categoryHandler := categoryHandlers.NewCategoryHandler(categoryRepo)
+
 	// Set up routes
-	routes.SetupRoutes(r, userHandler)
+	routes.SetupRoutes(r, userHandler, categoryHandler)
 
 	// Initialize Swagger documentation
 	docs.SwaggerInfo.BasePath = "/api"
