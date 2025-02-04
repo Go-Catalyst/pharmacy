@@ -1,8 +1,11 @@
 package models
 
-import "gorm.io/gorm"
+//import "gorm.io/gorm"
 
 type Drug struct {
-	gorm.Model
-	Name string
+	ID         uint   `gorm:"primaryKey" json:"id"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	Expiration string `json:"expiration"`
+	Doses      int    `json:"doses"`
 }

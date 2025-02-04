@@ -2,12 +2,13 @@ package routes
 
 import (
 	category "pharmacy/internal/categories/handlers"
+	drug "pharmacy/internal/drugs/handlers"
 	user "pharmacy/internal/users/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler, categoryHandlers *category.CategoryHandler) {
+func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler, categoryHandlers *category.CategoryHandler, drugHandler *drug.DrugHandler) {
 	api := r.Group("/api")
 	{
 		api.GET("/users", userHandler.GetUsers)
@@ -21,6 +22,11 @@ func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler, categoryHandlers 
 		api.POST("/categories", categoryHandlers.CreateCategory)
 		api.PUT("/categories/:id", categoryHandlers.UpdateCategory)
 		api.DELETE("/categories/:id", categoryHandlers.DeleteCategory)
+
+		// Drug
+		api.GET("/drugs", drugHandler.GetAllDrugs)    
+		api.GET("/drugs/:id", drugHandler.GetDrugByID)  
+		api.POST("/drugs", drugHandler.AddDrug)
 
 	}
 
