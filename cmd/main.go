@@ -2,18 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"pharmacy/config"
 	"pharmacy/docs"
 	categoryHandlers "pharmacy/internal/categories/handlers"
 	categoryRepo "pharmacy/internal/categories/repository"
+	drugHandlers "pharmacy/internal/drugs/handlers"
+	drugRepo "pharmacy/internal/drugs/repository"
 	userHandlers "pharmacy/internal/users/handlers"
 	userRepo "pharmacy/internal/users/repository"
 	"pharmacy/routes"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title User CRUD API
@@ -46,8 +47,11 @@ func main() {
 	categoryRepo := categoryRepo.NewCategoryRepository(config.DB)
 	categoryHandler := categoryHandlers.NewCategoryHandler(categoryRepo)
 
+	drugRepo := drugRepo.NewDrugRepository(config.DB)
+	drugHandler := drugHandlers.NewDrugHandler(drugRepo)
+
 	// Set up routes
-	routes.SetupRoutes(r, userHandler, categoryHandler)
+	routes.SetupRoutes(r, userHandler, categoryHandler, drugHandler)
 
 	// Initialize Swagger documentation
 	docs.SwaggerInfo.BasePath = "/api"
