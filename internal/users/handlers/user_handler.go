@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"pharmacy/internal/users/models"
@@ -10,6 +9,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+
+	//"golang.org/x/tools/go/analysis/passes/nilfunc"
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,14 @@ func NewUserHandler(repo *repositories.UserRepository) *UserHandler {
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+func HashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashed), nil
 }
 
 // GetUsers godoc
@@ -77,6 +86,12 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if _, err := HashPassword(user.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Couldn't hash password"})
+		return
+	}
+
+	user.Password, _ = HashPassword(user.Password)
 	h.Repo.CreateUser(&user)
 
 	c.JSON(http.StatusCreated, user)
@@ -129,7 +144,6 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
-	var User models.User
 	var Loginrequest LoginRequest
 	if err := c.ShouldBindJSON(&Loginrequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input, username and password are required"})
@@ -140,7 +154,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	user, err := h.Repo.GetUserByEmail(Loginrequest.Username)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password1"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		}
@@ -148,8 +162,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	// Compare the stored hashed password with the provided password
-	if bcrypt.CompareHashAndPassword([]byte(User.Password), []byte(Loginrequest.Password)) != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Loginrequest.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password", "txt":err })
 		return
 	}
 
