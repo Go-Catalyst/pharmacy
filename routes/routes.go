@@ -4,30 +4,36 @@ import (
 	category "pharmacy/internal/categories/handlers"
 	drug "pharmacy/internal/drugs/handlers"
 	user "pharmacy/internal/users/handlers"
+	jwt "pharmacy/internal/users/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes(r *gin.Engine, userHandler *user.UserHandler, categoryHandlers *category.CategoryHandler, drugHandler *drug.DrugHandler) {
 	api := r.Group("/api")
-	{
-		api.GET("/users", userHandler.GetUsers)
-		api.GET("/users/:id", userHandler.GetUser)
-		api.POST("/users", userHandler.CreateUser)
-		api.PUT("/users/:id", userHandler.UpdateUser)
-		api.DELETE("/users/:id", userHandler.DeleteUser)
-		api.POST("/jwt", userHandler.Login)
+	
+		user := api.Group("/users")
+		
+		user.GET("", userHandler.GetUsers)
+		user.GET("/:id", userHandler.GetUser, jwt.AuthMiddleware())
+		user.POST("", userHandler.CreateUser)
+		user.PUT("/:id", userHandler.UpdateUser, jwt.AuthMiddleware())
+		user.DELETE("/:id", userHandler.DeleteUser, jwt.AuthMiddleware())
+		user.POST("/jwt", userHandler.Login)
 
-		api.GET("/categories/:id", categoryHandlers.GetCategory)
-		api.POST("/categories", categoryHandlers.CreateCategory)
-		api.PUT("/categories/:id", categoryHandlers.UpdateCategory)
-		api.DELETE("/categories/:id", categoryHandlers.DeleteCategory)
+		category := api.Group("/categories", jwt.AuthMiddleware() ) 
+		
+		category.GET("/:id", categoryHandlers.GetCategory)
+		category.POST("", categoryHandlers.CreateCategory)
+		category.PUT("/:id", categoryHandlers.UpdateCategory)
+		category.DELETE("/:id", categoryHandlers.DeleteCategory)
+	
+		drug := api.Group("/drugs", jwt.AuthMiddleware())
 
-		// Drug
-		api.GET("/drugs", drugHandler.GetAllDrugs)    
-		api.GET("/drugs/:id", drugHandler.GetDrugByID)  
-		api.POST("/drugs", drugHandler.AddDrug)
+		drug.GET("", drugHandler.GetAllDrugs)    
+		drug.GET("/:id", drugHandler.GetDrugByID)  
+		drug.POST("", drugHandler.AddDrug)
 
-	}
+	
 
 }
