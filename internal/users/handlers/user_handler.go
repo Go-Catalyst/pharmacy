@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"pharmacy/internal/users/models"
@@ -160,7 +161,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Name,
-		"exp":      time.Now().Add(time.Hour * 1).Unix(),
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // changed it to 24h for testing
 	})
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {

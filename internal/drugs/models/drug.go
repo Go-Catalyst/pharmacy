@@ -1,11 +1,15 @@
 package models
 
-//import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
+
 
 type Drug struct {
-	ID         uint   `gorm:"primaryKey" json:"id"`
+	gorm.Model
 	Name       string `json:"name"`
 	Category   string `json:"category"`
-	Expiration string `json:"expiration"`
+	Expiration time.Time `gorm:"not null" json:"exp"`
 	Doses      int    `json:"doses"`
 }
